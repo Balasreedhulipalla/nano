@@ -11,13 +11,15 @@ from .serializers import CreateAdminSerializer
 User = get_user_model()
 
 
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 class IsSuperAdmin(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == 'super_admin'
+        return request.user.is_authenticated and (request.user.role == 'super_admin' or request.user.is_superuser)
 
 
 class AdminDashboardView(APIView):
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsSuperAdmin]
 
     def get(self, request):
@@ -44,15 +46,14 @@ class CreateAdminView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        full_name = request.data.get("full_name")
-        email = request.data.get("email")
-        password = request.data.get("password")
-
-        # create admin logic here
-        return Response({"message": "Admin created"}, status=status.HTTP_201_CREATED)
+        serializer = CreateAdminSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Admin/User created successfully"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class DeleteAdminView(APIView):
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsSuperAdmin]
 
     def delete(self, request, user_id):

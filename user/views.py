@@ -151,19 +151,10 @@ class SelectRoleView(APIView):
     def post(self, request):
         user = request.user
 
-        if user.is_role_selected:
-            return Response(
-                {"error": "Role already selected."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        user.role = "researcher"
-        user.is_role_selected = True
+        user.role = request.data.get("role")
         user.save()
 
-        return Response({
-            "message": "Researcher role assigned successfully."
-        })
+        return Response({"message": "Role updated successfully"})
 
 
 # =========================
@@ -199,7 +190,7 @@ class ProfileView(APIView):
     def get(self, request):
         serializer = ProfileSerializer(request.user)
         return Response(serializer.data)
-    from .models import Notification
+
 
 
 class NotificationView(APIView):

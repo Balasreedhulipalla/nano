@@ -6,7 +6,7 @@ SECRET_KEY = 'django-insecure-c9p@@t!curr%(h9+^de7ud6(##g6m196+#q0fr4rae*acjbkiw
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # ===============================
@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     # Third‑party
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
 
     # Local apps
     'user',
@@ -35,6 +36,7 @@ INSTALLED_APPS = [
 # MIDDLEWARE
 # ===============================
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -43,6 +45,16 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# ===============================
+# CORS SETTINGS
+# ===============================
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://127.0.0.1:5173',
+]
+CORS_ALLOW_ALL_ORIGINS = True  # For development only
 
 
 ROOT_URLCONF = 'researcher.urls'
@@ -72,31 +84,17 @@ WSGI_APPLICATION = 'researcher.wsgi.application'
 
 # ===============================
 # DATABASE (MySQL - XAMPP)
-# Use SQLite by default in development when `USE_SQLITE` env var is not set to '0'
 # ===============================
-import os
-
-# Use SQLite for development by default, MySQL for production
-USE_SQLITE = os.getenv('USE_SQLITE', '1') == '1'
-
-if USE_SQLITE:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'nano_db',
+        'USER': 'root',
+        'PASSWORD': 'roos',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'nano_db',
-            'USER': 'root',
-            'PASSWORD': 'roos',
-            'HOST': '127.0.0.1',
-            'PORT': '3306',
-        }
-    }
+}
 # ===============================
 # PASSWORD VALIDATION
 # ===============================
